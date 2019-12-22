@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <script type="text/javascript" src="../../node_modules/paper/dist/paper-core.min.js"></script>
+    <script type="text/javascript" src="../../node_modules/animejs/lib/anime.min.js"></script>
+    <link href="https://fonts.googleapis.com/css?family=Bowlby+One+SC|Quicksand&display=swap" rel="stylesheet">
+    <title>test</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #111;
+        }
+
+        #lightning {
+            background-color: #fff;
+            width: 100vw;
+            height: 100vh;
+            position: fixed;
+            top: 0;
+            left: 0;
+            display: none;
+        }
+
+        #thunder {
+
+            width: 100vw;
+            height: 100vh;
+            position: fixed;
+            top: 0;
+            left: 0;
+
+        }
+        #thunder embed{
+            position: absolute;
+            top: -2%;
+            left: 0;
+            /* transform: translate(-50%, -50%); */
+            width: 50%;
+            transform-origin: 100% 0%;
+            display: none;
+
+        }
+        #thunder embed:first-child{
+            transform-origin: 60% 0%;
+
+        }
+
+        .flash {
+            display: block;
+        }
+
+        #bg g>path {
+            fill: #fff;
+            /* transition: transform 2000ms;
+            transition-timing-function: linear; */
+
+        }
+
+        #theme {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            /* width: 60%; */
+            transform: translate(-50%, -50%);
+            /* z-index: 100; */
+            text-align: center;
+        }
+
+        #theme-h1 {
+            font-family: 'Bowlby One SC', cursive;
+            font-size: 10rem;
+            color: #fff;
+            line-height: 10rem;
+            margin-bottom: 1.5rem;
+            outline: none;
+            cursor: pointer;
+            transition: transform 100ms;
+        }
+
+        .heartbeat {
+            transform: scale(1.05);
+        }
+
+        #theme-h2 {
+            font-family: 'Quicksand', sans-serif;
+            font-size: 1.5em;
+            color: #fff;
+        }
+
+        #outer {
+            width: 50%;
+            height: 95vh;
+            margin: 3rem auto;
+            background: hsl(0, 100, 50);
+            position: relative;
+        }
+
+        #inner {
+            width: 25%;
+            height: 25%;
+            background-color: rgba(55, 44, 77, 0.4);
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        svg {
+            width: 100%;
+            height: 100vh;
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+
+        svg path {
+            fill: none;
+            /* stroke: ; */
+
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            stroke-width: 0.2;
+            opacity: 0.8;
+        }
+
+
+    </style>
+</head>
+
+<body>
+
+    <div id="lightning"></div>
+
+    <div id="thunder">
+        <embed src="../../widget/thunder1.svg" type="">
+        <embed src="../../widget/thunder2.svg" type="">
+        <embed src="../../widget/thunder3.svg" type="">
+
+    </div>
+
+    <div id="bg">
+
+    </div>
+
+
+    <div id="theme">
+        <div id="theme-h1">The spectre </br> before us</div>
+        <div id="theme-h2">Mercurial the Spectre is a melee agility hero, adept at dealing pure damage to lone targets
+        </div>
+    </div>
+
+    <script src="../js/utils.js"></script>
+    <script src="../js/queue.js"></script>
+
+    <script>
+
+
+
+        var arr1 = [];
+        var arr2 = [];
+
+        const rain_point_len = 0.5;
+
+        for (let i = 0; i < 1000; i++) {
+            arr1.push(new Point2D(40 + Math.random() * 120, 1 + Math.random() * 98));
+            arr2.push(new Point2D(40 + Math.random() * 120, 1 + Math.random() * 98));
+        }
+
+        var svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+        svg.setAttribute("viewBox", "0 0 200 100");
+        svg.setAttribute("fill-rule", "nonzero");
+        var path1 = document.createElementNS("http://www.w3.org/2000/svg", "path");
+        var path2 = document.createElementNS("http://www.w3.org/2000/svg", "path");
+
+        var rain_group = document.createElementNS("http://www.w3.org/2000/svg", "g");
+        for (var i = 0; i < 300; i++) {
+            rain_group.appendChild(document.createElementNS("http://www.w3.org/2000/svg", "path"));
+        }
+        svg.appendChild(rain_group);
+
+        for (var rain of rain_group.children) {
+            var drop_len = Math.ceil(Math.random() * 6 + 3);
+            var drop = new SVGWidthQueue(drop_len, Math.random() * 0.3 + 0.2);
+            var drop_y_start = 0;
+            var drop_x_position = Math.random() * 200;
+            var drop_y_bottom;
+            for (var j = 0; j < drop_len; j++) {
+                // on the sky
+                drop.push(new Point2D(drop_x_position, drop_y_start + j * rain_point_len));
+            }
+            rain.setAttribute('d', drop.toPath());
+            rain.style.opacity = 0.3 + Math.random() * 0.45;
+            drop_y_bottom = -100 * Math.random();
+            rain.style.transform = `translateY(${drop_y_bottom}px)`;
+            rain.setAttribute('drop_y_bottom', drop_y_bottom);
+        }
+
+
+        svg.appendChild(path1);
+        svg.appendChild(path2);
+
+        document.querySelector('#bg').appendChild(svg);
+
+        const queue1 = new SVGQueue(15);
+        const queue2 = new SVGQueue(15);
+
+        var cnt = 0;
+        var shabi = setInterval(() => {
+            queue1.push(arr1[(cnt++) % arr1.length]);
+            queue2.push(arr2[(cnt++) % arr2.length]);
+            path1.style.stroke = `hsl(${cnt % 360}, 80%, 50%)`;
+            path1.setAttribute('d', queue1.toPath());
+            path2.style.stroke = `hsl(${(cnt + 180) % 360}, 80%, 50%)`;
+            path2.setAttribute('d', queue2.toPath());
+        }, 50);
+
+
+        var heartbeat = 1000;
+
+        setInterval(() => {
+            setTimeout(() => {
+                document.querySelector('#theme-h1').classList.toggle('heartbeat');
+            }, 0.47 * heartbeat);
+            setTimeout(() => {
+                document.querySelector('#theme-h1').classList.toggle('heartbeat');
+            }, 0.53 * heartbeat);
+        }, heartbeat);
+
+        // let rain drop
+        const delay_array = []
+        for (let i = 0; i < rain_group.children.length; i++) {
+            delay_array.push(Math.round(Math.random() * 2000));
+        }
+
+        async function playAnime(rain){
+
+            var first_round_ani = anime({
+                targets: rain,
+                translateY: 0,
+                easing: 'linear',
+                duration: -20 * parseFloat(rain.getAttribute('drop_y_bottom')),
+            });
+            first_round_ani.play();
+            await first_round_ani.finished;
+            // console.log('get');
+
+            anime({
+                targets: rain,
+                translateY: 100,
+                loop: true,
+                easing: 'linear',
+                duration: 2000,
+            });
+
+        }
+
+        for (var rain of rain_group.children) {
+            playAnime(rain);
+        }
+
+        // thunder
+        const lightning = document.querySelector('#lightning');
+        const thunders = document.querySelectorAll('#thunder embed');
+        (async () => {
+            while (true) {
+                // console.log('flash!');
+                await new Promise(r => {
+                    setTimeout(() => {
+                        // flash for 1~3 times
+                        var times = Math.floor(Math.random() * 2.5 + 1);
+                        var flashInterval = parseInt(Math.random() * 120 + 80);
+                        var cnt = 0;
+                        var interval = setInterval(() => {
+                            if (cnt == times) {
+                                clearInterval(interval);
+                                return;
+                            };
+                            var thunder_index = Math.floor(Math.random() * 3);
+                            var _thunder = thunders[thunder_index];
+                            var rotate = Math.random() * 20 + -40;
+                            var mirror = Math.random() > 0.5 ? 1 : -1;
+                            var thunder_tran_x = thunder_index == 0 ? Math.random() * 50 - 25 : Math.random() * 50 + 50;
+
+                            // lightning last for 0.4 * flashInterval
+                            setTimeout(() => {
+                                // thunder begin
+                                _thunder.style.display = 'block';
+                                setTimeout(() => {
+                                    _thunder.style.transform = `translateX(${thunder_tran_x}%) rotate(${rotate}deg) scale(${mirror})` ;
+                                });
+
+                            }, 0);
+                            setTimeout(() => {
+                                // flash begin
+                                lightning.style.display = 'block';
+                            }, 0.3 * flashInterval);
+                            setTimeout(() => {
+                                // thunder end
+                                _thunder.style.display = 'none';
+                            }, 0.5 * flashInterval);
+                            setTimeout(() => {
+                                // flash end
+                                lightning.style.display = 'none';
+                            }, 0.7 * flashInterval);
+
+                            cnt++;
+
+                        }, flashInterval);
+                        r();
+                    }, 1000 * parseInt(Math.random() * 1.5 + 3));
+                });
+            }
+        })();
+
+
+
+    </script>
+
+</body>
+
+</html>
